@@ -22,7 +22,7 @@ func GetUser(c *gin.Context)  {
 
 	user, err := service.GetUser(id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "user null"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "no users"})
 		return
 	}
 
@@ -48,9 +48,19 @@ func CreateUser(c *gin.Context)  {
 		return
 	}
 
+	if age <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"status": "age should be bigger than 0"})
+		return
+	}
+
 	user.Name = c.PostForm("Name")
 	user.Age = age
-	
-	service.CreateUser(user)
-	c.Status(http.StatusCreated)
+
+	createUser, err := service.CreateUser(user)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	c.JSON(http.StatusCreated,createUser)
 }
